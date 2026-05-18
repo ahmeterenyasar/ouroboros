@@ -26,6 +26,7 @@ class EmptySection extends StatelessWidget {
       ),
       child: Text(
         label,
+        textAlign: TextAlign.center,
         style: GoogleFonts.inter(
           color: AppColors.textSecondary,
           fontSize: 13,
