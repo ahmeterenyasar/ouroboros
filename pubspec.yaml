@@ -1,0 +1,36 @@
+name: ouroboros
+description: "A minimalist, dark surrealism habit tracker."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  
+  # State Management
+  flutter_riverpod: ^2.5.1
+  
+  # Local Database (Isar)
+  isar: ^3.1.0
+  isar_flutter_libs: ^3.1.0
+  path_provider: ^2.1.2
+  
+  # Typography & Design
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  
+  # Code Generation for Isar Models
+  build_runner: ^2.4.9
+  isar_generator: ^3.1.0
+
+flutter:
+  uses-material-design: true
