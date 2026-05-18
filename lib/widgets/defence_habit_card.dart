@@ -73,9 +73,7 @@ class DefenceHabitCard extends ConsumerWidget {
                     fontWeight: FontWeight.w800,
                     height: 0.85,
                     letterSpacing: -2.5,
-                    color: complete
-                        ? AppColors.defenceBright
-                        : AppColors.textPrimary,
+                    color: complete ? AppColors.defenceBright : AppColors.textPrimary,
                   ),
                 ),
                 Padding(
@@ -95,8 +93,7 @@ class DefenceHabitCard extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: AppColors.defenceBorder,
@@ -124,6 +121,49 @@ class DefenceHabitCard extends ConsumerWidget {
             child: _SegmentedProgress(filled: filled, total: target),
           ),
 
+          // ─── All-time stats ────────────────────────────────────────
+          if (habit.pastPeriodCount > 0)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
+              child: Row(
+                children: [
+                  Text(
+                    'ALL-TIME',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.8,
+                      color: AppColors.textTertiary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${habit.pastCompletions} / ${habit.pastExpected}',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.3,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 36,
+                    child: Text(
+                      habit.allTimeRateLabel,
+                      textAlign: TextAlign.right,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                        color: habit.allTimeRate >= 0.8 ? AppColors.defenceBright : AppColors.textTertiary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Hairline separator
           Container(height: 1, color: AppColors.strokeFaint),
 
@@ -133,17 +173,11 @@ class DefenceHabitCard extends ConsumerWidget {
               Expanded(
                 flex: 4,
                 child: InkWell(
-                  onTap: complete
-                      ? null
-                      : () => ref
-                          .read(habitRepositoryProvider)
-                          .registerCompletion(habit),
+                  onTap: complete ? null : () => ref.read(habitRepositoryProvider).registerCompletion(habit),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: complete
-                          ? Colors.transparent
-                          : AppColors.defenceTint,
+                      color: complete ? Colors.transparent : AppColors.defenceTint,
                     ),
                     child: Center(
                       child: Text(
@@ -152,9 +186,7 @@ class DefenceHabitCard extends ConsumerWidget {
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 3,
-                          color: complete
-                              ? AppColors.textTertiary
-                              : AppColors.defenceBright,
+                          color: complete ? AppColors.textTertiary : AppColors.defenceBright,
                         ),
                       ),
                     ),
@@ -164,20 +196,14 @@ class DefenceHabitCard extends ConsumerWidget {
               Container(width: 1, height: 50, color: AppColors.strokeFaint),
               Expanded(
                 child: InkWell(
-                  onTap: filled == 0
-                      ? null
-                      : () => ref
-                          .read(habitRepositoryProvider)
-                          .undoLastCompletion(habit),
+                  onTap: filled == 0 ? null : () => ref.read(habitRepositoryProvider).undoLastCompletion(habit),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Center(
                       child: Icon(
                         Icons.undo,
                         size: 16,
-                        color: filled == 0
-                            ? AppColors.textTertiary
-                            : AppColors.textSecondary,
+                        color: filled == 0 ? AppColors.textTertiary : AppColors.textSecondary,
                       ),
                     ),
                   ),

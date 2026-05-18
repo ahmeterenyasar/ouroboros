@@ -128,4 +128,49 @@ class Habit {
         return 'TOTAL';
     }
   }
+
+  /// Number of fully-elapsed periods between startDate and the current period.
+  @ignore
+  int get pastPeriodCount {
+    if (type != HabitType.defence) return 0;
+    final current = currentPeriodStart;
+    switch (periodType) {
+      case PeriodType.daily:
+        final startDay = DateTime(startDate.year, startDate.month, startDate.day);
+        return current.difference(startDay).inDays;
+      case PeriodType.weekly:
+        final wd = startDate.weekday;
+        final startMonday = startDate.subtract(Duration(days: wd - 1));
+        final startWeek = DateTime(startMonday.year, startMonday.month, startMonday.day);
+        return current.difference(startWeek).inDays ~/ 7;
+      case PeriodType.monthly:
+        final startMonth = DateTime(startDate.year, startDate.month, 1);
+        return (current.year - startMonth.year) * 12 +
+               (current.month - startMonth.month);
+      case PeriodType.continuous:
+        return 0;
+    }
+  }
+
+  @ignore
+  int get pastCompletions {
+    if (type != HabitType.defence) return 0;
+    final current = currentPeriodStart;
+    return actionLogs.where((d) => d.isBefore(current)).length;
+  }
+
+  @ignore
+  int get pastExpected => pastPeriodCount * targetCount;
+
+  @ignore
+  double get allTimeRate {
+    if (pastExpected <= 0) return 0.0;
+    return (pastCompletions / pastExpected).clamp(0.0, 1.0);
+  }
+
+  @ignore
+  String get allTimeRateLabel {
+    if (pastPeriodCount == 0) return '';
+    return '${(allTimeRate * 100).round()}%';
+  }
 }
