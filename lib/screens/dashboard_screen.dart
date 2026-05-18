@@ -21,141 +21,113 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: habitsAsync.when(
-          loading: () => const Center(
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.5,
-                color: AppColors.textSecondary,
+        child: DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              const _DashboardHeader(),
+              TabBar(
+                indicatorColor: AppColors.strokeStrong,
+                indicatorWeight: 2,
+                labelPadding: const EdgeInsets.symmetric(vertical: 12),
+                tabs: [
+                  Tab(
+                    child: Text(
+                      'ATTACK',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 3.0,
+                        fontSize: 11,
+                        color: AppColors.attackPrimary,
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      'DEFENCE',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 3.0,
+                        fontSize: 11,
+                        color: AppColors.defencePrimary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          error: (e, st) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                'Database error: $e',
-                style: const TextStyle(color: AppColors.attackBright),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _TabBody(
+                      habitsAsync: habitsAsync,
+                      empty: const EmptySection(
+                        label: 'No bad habits being broken.\nAdd one to start the clock.',
+                        accent: AppColors.attackPrimary,
+                      ),
+                      list: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: attack.length,
+                        itemBuilder: (_, i) {
+                          final habit = attack[i];
+                          return Dismissible(
+                            key: ValueKey(habit.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: const Color(0xFF8B0000),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(
+                                CupertinoIcons.trash,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            onDismissed: (_) {
+                              ref.read(habitRepositoryProvider).deleteHabit(habit.id);
+                            },
+                            child: AttackHabitCard(habit: habit),
+                          );
+                        },
+                      ),
+                      isEmpty: attack.isEmpty,
+                    ),
+                    _TabBody(
+                      habitsAsync: habitsAsync,
+                      empty: const EmptySection(
+                        label: 'No good habits being built.\nAdd one to set a target.',
+                        accent: AppColors.defencePrimary,
+                      ),
+                      list: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: defence.length,
+                        itemBuilder: (_, i) {
+                          final habit = defence[i];
+                          return Dismissible(
+                            key: ValueKey(habit.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              color: const Color(0xFF8B0000),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(
+                                CupertinoIcons.trash,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            onDismissed: (_) {
+                              ref.read(habitRepositoryProvider).deleteHabit(habit.id);
+                            },
+                            child: DefenceHabitCard(habit: habit),
+                          );
+                        },
+                      ),
+                      isEmpty: defence.isEmpty,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          data: (_) => DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                // TabBar with minimal styling
-                Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: AppColors.strokeFaint, width: 1),
-                    ),
-                  ),
-                  child: TabBar(
-                    indicatorColor: AppColors.defencePrimary,
-                    indicatorWeight: 2,
-                    labelStyle: GoogleFonts.inter(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2.8,
-                      fontSize: 11,
-                    ),
-                    unselectedLabelStyle: GoogleFonts.inter(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2.8,
-                      fontSize: 11,
-                    ),
-                    labelColor: AppColors.defencePrimary,
-                    unselectedLabelColor: AppColors.textTertiary,
-                    tabs: const [
-                      Tab(text: 'ATTACK'),
-                      Tab(text: 'DEFENCE'),
-                    ],
-                  ),
-                ),
-                // TabBarView
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      // Attack Tab
-                      if (attack.isEmpty)
-                        const Center(
-                          child: EmptySection(
-                            label:
-                                'No bad habits being broken.\nAdd one to start the clock.',
-                            accent: AppColors.attackPrimary,
-                          ),
-                        )
-                      else
-                        ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: attack.length,
-                          itemBuilder: (_, i) {
-                            final habit = attack[i];
-                            return Dismissible(
-                              key: ValueKey(habit.id),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                color: const Color(0xFF8B0000),
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 20),
-                                child: const Icon(
-                                  CupertinoIcons.trash,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                              onDismissed: (_) {
-                                ref
-                                    .read(habitRepositoryProvider)
-                                    .deleteHabit(habit.id);
-                              },
-                              child: AttackHabitCard(habit: habit),
-                            );
-                          },
-                        ),
-                      // Defence Tab
-                      if (defence.isEmpty)
-                        const Center(
-                          child: EmptySection(
-                            label:
-                                'No good habits being built.\nAdd one to set a target.',
-                            accent: AppColors.defencePrimary,
-                          ),
-                        )
-                      else
-                        ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: defence.length,
-                          itemBuilder: (_, i) {
-                            final habit = defence[i];
-                            return Dismissible(
-                              key: ValueKey(habit.id),
-                              direction: DismissDirection.endToStart,
-                              background: Container(
-                                color: const Color(0xFF8B0000),
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 20),
-                                child: const Icon(
-                                  CupertinoIcons.trash,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                              onDismissed: (_) {
-                                ref
-                                    .read(habitRepositoryProvider)
-                                    .deleteHabit(habit.id);
-                              },
-                              child: DefenceHabitCard(habit: habit),
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -166,6 +138,126 @@ class DashboardScreen extends ConsumerWidget {
             fullscreenDialog: true,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TabBody extends StatelessWidget {
+  const _TabBody({
+    required this.habitsAsync,
+    required this.empty,
+    required this.list,
+    required this.isEmpty,
+  });
+
+  final AsyncValue<Object?> habitsAsync;
+  final Widget empty;
+  final Widget list;
+  final bool isEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    return habitsAsync.when(
+      loading: () => const Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 1.5,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ),
+      error: (e, st) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Database error: $e',
+            style: const TextStyle(color: AppColors.attackBright),
+          ),
+        ),
+      ),
+      data: (_) => isEmpty ? Center(child: empty) : list,
+    );
+  }
+}
+
+class _DashboardHeader extends StatelessWidget {
+  const _DashboardHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'THE BATTLE LOG',
+            style: GoogleFonts.inter(
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              height: 1.0,
+              letterSpacing: -1.2,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const _ConceptLine(
+            label: 'ATTACK',
+            labelColor: AppColors.attackPrimary,
+            text: 'Endure and break. A race against the clock.',
+          ),
+          const SizedBox(height: 6),
+          const _ConceptLine(
+            label: 'DEFENCE',
+            labelColor: AppColors.defencePrimary,
+            text: 'Build and fortify. Consistency over time.',
+          ),
+          const SizedBox(height: 14),
+          Container(height: 1, color: AppColors.strokeFaint),
+        ],
+      ),
+    );
+  }
+}
+
+class _ConceptLine extends StatelessWidget {
+  const _ConceptLine({
+    required this.label,
+    required this.labelColor,
+    required this.text,
+  });
+
+  final String label;
+  final Color labelColor;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$label: ',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+              color: labelColor,
+            ),
+          ),
+          TextSpan(
+            text: text,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.1,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }
