@@ -72,6 +72,12 @@ class HabitRepository {
       await _isar.habits.put(dbHabit);
     });
   }
+
+  Future<void> deleteHabit(int id) async {
+    await _isar.writeTxn(() async {
+      await _isar.habits.delete(id);
+    });
+  }
 }
 
 final habitRepositoryProvider = Provider<HabitRepository>((ref) {

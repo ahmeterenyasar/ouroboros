@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +8,6 @@ import '../theme/app_colors.dart';
 import '../widgets/attack_habit_card.dart';
 import '../widgets/defence_habit_card.dart';
 import '../widgets/empty_section.dart';
-import '../widgets/section_header.dart';
 import 'add_habit_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -41,59 +41,121 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ),
           ),
-          data: (_) => CustomScrollView(
-            slivers: [
-              // ─── Masthead ─────────────────────────────────────────
-              const SliverToBoxAdapter(child: _Masthead()),
-
-              // ─── ATTACK section ───────────────────────────────────
-              SliverToBoxAdapter(
-                child: SectionHeader(
-                  label: 'ATTACK',
-                  count: attack.length,
-                  accent: AppColors.attackPrimary,
-                ),
-              ),
-              if (attack.isEmpty)
-                const SliverToBoxAdapter(
-                  child: EmptySection(
-                    label: 'No bad habits being broken.\nAdd one to start the clock.',
-                    accent: AppColors.attackPrimary,
+          data: (_) => DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                // TabBar with minimal styling
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: AppColors.strokeFaint, width: 1),
+                    ),
                   ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) => AttackHabitCard(habit: attack[i]),
-                    childCount: attack.length,
-                  ),
-                ),
-
-              // ─── DEFENCE section ──────────────────────────────────
-              SliverToBoxAdapter(
-                child: SectionHeader(
-                  label: 'DEFENCE',
-                  count: defence.length,
-                  accent: AppColors.defencePrimary,
-                ),
-              ),
-              if (defence.isEmpty)
-                const SliverToBoxAdapter(
-                  child: EmptySection(
-                    label: 'No good habits being built.\nAdd one to set a target.',
-                    accent: AppColors.defencePrimary,
-                  ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) => DefenceHabitCard(habit: defence[i]),
-                    childCount: defence.length,
+                  child: TabBar(
+                    indicatorColor: AppColors.defencePrimary,
+                    indicatorWeight: 2,
+                    labelStyle: GoogleFonts.inter(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2.8,
+                      fontSize: 11,
+                    ),
+                    unselectedLabelStyle: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.8,
+                      fontSize: 11,
+                    ),
+                    labelColor: AppColors.defencePrimary,
+                    unselectedLabelColor: AppColors.textTertiary,
+                    tabs: const [
+                      Tab(text: 'ATTACK'),
+                      Tab(text: 'DEFENCE'),
+                    ],
                   ),
                 ),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 120)),
-            ],
+                // TabBarView
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      // Attack Tab
+                      if (attack.isEmpty)
+                        const Center(
+                          child: EmptySection(
+                            label:
+                                'No bad habits being broken.\nAdd one to start the clock.',
+                            accent: AppColors.attackPrimary,
+                          ),
+                        )
+                      else
+                        ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: attack.length,
+                          itemBuilder: (_, i) {
+                            final habit = attack[i];
+                            return Dismissible(
+                              key: ValueKey(habit.id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                color: const Color(0xFF8B0000),
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                child: const Icon(
+                                  CupertinoIcons.trash,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              onDismissed: (_) {
+                                ref
+                                    .read(habitRepositoryProvider)
+                                    .deleteHabit(habit.id);
+                              },
+                              child: AttackHabitCard(habit: habit),
+                            );
+                          },
+                        ),
+                      // Defence Tab
+                      if (defence.isEmpty)
+                        const Center(
+                          child: EmptySection(
+                            label:
+                                'No good habits being built.\nAdd one to set a target.',
+                            accent: AppColors.defencePrimary,
+                          ),
+                        )
+                      else
+                        ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: defence.length,
+                          itemBuilder: (_, i) {
+                            final habit = defence[i];
+                            return Dismissible(
+                              key: ValueKey(habit.id),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                color: const Color(0xFF8B0000),
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                child: const Icon(
+                                  CupertinoIcons.trash,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              onDismissed: (_) {
+                                ref
+                                    .read(habitRepositoryProvider)
+                                    .deleteHabit(habit.id);
+                              },
+                              child: DefenceHabitCard(habit: habit),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -106,79 +168,6 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-/// Top-of-page masthead. No AppBar — we want generous breathing room
-/// and the bigger label.
-class _Masthead extends StatelessWidget {
-  const _Masthead();
-
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'ATTACK',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 3,
-                  color: AppColors.attackPrimary,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                width: 8,
-                height: 1,
-                color: AppColors.strokeStrong,
-              ),
-              Text(
-                'DEFENCE',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 3,
-                  color: AppColors.defencePrimary,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                _dateLabel(now),
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1.5,
-                  color: AppColors.textTertiary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            'A daily\nbattle log.',
-            style: GoogleFonts.inter(
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              height: 1.0,
-              letterSpacing: -1.4,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _dateLabel(DateTime d) {
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return '${d.day.toString().padLeft(2, '0')} ${months[d.month - 1]} ${d.year}';
   }
 }
 
