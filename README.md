@@ -33,7 +33,11 @@ Every byte stays on-device. No accounts, no sync, no cloud.
 
 ## Screenshots
 
-> _Add screenshots here._
+<p align="center">
+  <img src="assets/screenshots/dashboard.png" width="250" alt="Dashboard Screen" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/screenshots/add_habit.png" width="250" alt="Add Habit Screen" />
+</p>
 
 ---
 
