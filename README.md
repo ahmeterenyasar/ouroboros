@@ -34,9 +34,9 @@ Every byte stays on-device. No accounts, no sync, no cloud.
 ## Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/dashboard.png" width="250" alt="Dashboard Screen" />
+  <img src="assets/screenshots/attack_screen.png" width="250" alt="Attack Screen" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/screenshots/add_habit.png" width="250" alt="Add Habit Screen" />
+  <img src="assets/screenshots/defence_screen.png" width="250" alt="Defence Screen" />
 </p>
 
 ---
